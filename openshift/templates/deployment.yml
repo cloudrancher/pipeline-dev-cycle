@@ -48,7 +48,7 @@ objects:
         automatic: true
       type: ImageChange
       imageChangeParams:
-        automatic: false
+        automatic: true
         containerNames:
         - ${APP_NAME}
         from:
