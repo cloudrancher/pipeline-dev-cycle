@@ -14,6 +14,7 @@ objects:
     labels:
       name: ${APP_NAME}
       application: ${APP_NAME}
+      app: ${APP_NAME}
   spec:
     replicas: 1
     selector:
@@ -26,6 +27,7 @@ objects:
         labels:
           name: ${APP_NAME}
           application: ${APP_NAME}
+          app: ${APP_NAME}
           deploymentConfig: ${APP_NAME}
       spec:
         containers:
@@ -62,6 +64,7 @@ objects:
     labels:
       name: ${APP_NAME}
       application: ${APP_NAME}
+      app: ${APP_NAME}
   spec:
     ports:
     - port: 8080
@@ -76,6 +79,7 @@ objects:
     labels:
       name: ${APP_NAME}
       application: ${APP_NAME}
+      app: ${APP_NAME}
   spec:
     host: ${HOSTNAME_HTTP}
     to:
