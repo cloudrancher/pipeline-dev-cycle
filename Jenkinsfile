@@ -46,7 +46,7 @@ pipeline() {
 				script {
 				   openshift.withCluster() {
 						  openshift.withProject() {
-							  def deployObjList = openshift.process('-f','openshift/templates/deployment.yml','-p');
+							  def deployObjList = openshift.process('-f','openshift/templates/deployment.yml');
 							  devDeploy = openshift.apply(deployObjList).narrow("bc")
 							  echo "**** Created Deploy Pipeline: ${devDeploy.object().metadata.name}"
 						  }
