@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: Template
+labels:
+  template: pipeline-dev-cycle-build-template
+metadata:
+  annotations:
+    application: pipeline-dev-cycle
+  name: pipeline-dev-cycle-build-template
+objects:
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    name: ${APP_NAME}-pipeline
+    labels:
+      application: ${APP_NAME}
+  spec:
+    successfulBuildsHistoryLimit: 4 
+    failedBuildsHistoryLimit: 2     
+    source:
+      git:
+        ref: ${SOURCE_REPOSITORY_REF}
+        uri: ${SOURCE_REPOSITORY_URL}
+    strategy:
+      jenkinsPipelineStrategy:
+        jenkinsfilePath: ${JENKINS_FILE}
+        env:
+        - name: APP_NAME
+          value: ${APP_NAME}
+        - name: INSTANCE
+          value: ${INSTANCE}
+        - name: SOURCE_REPOSITORY_URL
+          value: ${SOURCE_REPOSITORY_URL}
+        - name: SOURCE_REPOSITORY_REF
+          value: ${SOURCE_REPOSITORY_REF}
+      type: JenkinsPipeline
+parameters:
+- description: The name for the application.
+  displayName: Application Name
+  name: APP_NAME
+  value: pipeline-dev-cycle
+- description: Git source URI for application
+  displayName: Git Repository URL
+  name: SOURCE_REPOSITORY_URL
+  required: true
+- description: Git branch/tag reference
+  displayName: Git Reference
+  name: SOURCE_REPOSITORY_REF
+  value: master
+- description: Path of the pipeline file
+  displayName: Jenkinsfile
+  name: JENKINS_FILE
+  value: Jenkinsfile
+  

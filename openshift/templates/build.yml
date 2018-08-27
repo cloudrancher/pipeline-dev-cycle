@@ -1,0 +1,68 @@
+apiVersion: v1
+kind: Template
+labels:
+  template: pipeline-dev-cycle-build-template
+metadata:
+  annotations:
+    application: pipeline-dev-cycle
+  name: pipeline-dev-cycle-build-template
+objects:
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    labels:
+      application: ${APP_NAME}
+    name: ${APP_NAME}
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    name: ${APP_NAME}
+    labels:
+      application: ${APP_NAME}
+  spec:
+    successfulBuildsHistoryLimit: 4 
+    failedBuildsHistoryLimit: 2     
+    output:
+      to:
+        kind: ImageStreamTag
+        name: ${APP_NAME}:latest
+    source:
+      contextDir: ${CONTEXT_DIR}
+      git:
+        ref: ${SOURCE_REPOSITORY_REF}
+        uri: ${SOURCE_REPOSITORY_URL}
+      type: Git
+    strategy:
+      sourceStrategy:
+        forcePull: true
+        from:
+          kind: ImageStreamTag
+          name: ${BUILDER_IMAGE}
+          namespace: openshift
+        incremental: true
+      type: Source
+    triggers:
+    - imageChange: {}
+      type: ImageChange
+parameters:
+- description: The name for the application.
+  displayName: Application Name
+  name: APP_NAME
+  required: true
+  value: pipeline-dev-cycle
+- description: Git source URI for application
+  displayName: Git Repository URL
+  name: SOURCE_REPOSITORY_URL
+  required: true
+- description: Git branch/tag reference
+  displayName: Git Reference
+  name: SOURCE_REPOSITORY_REF
+  value: master
+- description: Builder Image
+  displayName: The name of the builder image
+  name: BUILDER_IMAGE
+  value: redhat-openjdk18-openshift:1.2
+- description: Path within Git project to build; empty for root project directory.
+  displayName: Context Directory
+  name: CONTEXT_DIR
+  value: /

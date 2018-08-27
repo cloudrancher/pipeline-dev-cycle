@@ -1,0 +1,95 @@
+apiVersion: v1
+kind: Template
+labels:
+  template: pipeline-dev-cycle-template
+metadata:
+  annotations:
+    application: pipeline-dev-cycle
+  name: pipeline-dev-cycle-template-service
+objects:
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    name: ${APP_NAME}
+    labels:
+      name: ${APP_NAME}
+      application: ${APP_NAME}
+  spec:
+    replicas: 1
+    selector:
+      name: ${APP_NAME}
+    strategy:
+      type: Recreate
+    template:
+      metadata:
+        name: ${APP_NAME}
+        labels:
+          name: ${APP_NAME}
+          application: ${APP_NAME}
+          deploymentConfig: ${APP_NAME}
+      spec:
+        containers:
+        - name: ${APP_NAME}
+          capabilities: {}
+          imagePullPolicy: Always
+          ports:
+          - containerPort: 8080
+            name: http
+            protocol: TCP
+          resources: {}
+          restartPolicy: Always
+          securityContext:
+            capabilities: {}
+            privileged: false
+        dnsPolicy: ClusterFirst
+    triggers:
+    - type: ConfigChange
+      configChangeParams:
+        automatic: true
+      type: ImageChange
+      imageChangeParams:
+        automatic: false
+        containerNames:
+        - ${APP_NAME}
+        from:
+          kind: ImageStreamTag
+          name: ${IMAGE_STREAM}
+    status: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: ${APP_NAME}
+    labels:
+      name: ${APP_NAME}
+      application: ${APP_NAME}
+  spec:
+    ports:
+    - port: 8080
+      targetPort: 8080
+    selector:
+      deploymentConfig: ${APP_NAME}
+- apiVersion: v1
+  id: ${APP_NAME}-http
+  kind: Route
+  metadata:
+    name: ${APP_NAME}
+    labels:
+      name: ${APP_NAME}
+      application: ${APP_NAME}
+  spec:
+    host: ${HOSTNAME_HTTP}
+    to:
+      name: ${APP_NAME}
+parameters:
+- description: The app name
+  displayName: App Name
+  name: APP_NAME
+  value: pipeline-dev-cycle
+- description: Image Stream for the pipeline-dev-cycle app
+  displayName: Image Stream
+  name: IMAGE_STREAM
+  value: pipeline-dev-cycle:latest
+- description: 'Custom hostname for http service route.  Leave blank for default hostname,
+    e.g.: <application-name>-<project>.<default-domain-suffix>'
+  displayName: Custom http Route Hostname
+  name: HOSTNAME_HTTP
