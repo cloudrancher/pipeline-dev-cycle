@@ -10,4 +10,9 @@ public class HelloController {
 	public String helloWorld(@RequestParam(value="name", defaultValue="World") String name) {
 		return "Hello "+name;
 	}
+	
+	@RequestMapping("/") 
+	public String helloRoot() {
+		return "Hello Root";
+	}
 }
